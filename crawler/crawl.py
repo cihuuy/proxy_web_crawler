@@ -53,6 +53,7 @@ class ProxyCrawler(object):
         self.sockets = [s[:-5].replace('</td>', ':') for s in revised]
 
     def search(self, socket):
+        try:
         sock = socket.split(':')
         self.proxy_host, self.proxy_port = sock[0], int(sock[1])
         self.set_current_proxy()
@@ -82,13 +83,23 @@ class ProxyCrawler(object):
                     found_link = link
                     break
             if found_link is not None:
-                found_link.click()
-                break
-           
-            self.random_sleep()
-            index = str(page_index + 1)
-            self.browser.find_element_by_link_text(index).click()
-            self.random_sleep(short=True)
+                    found_link.click()
+                    # Lakukan tindakan setelah menemukan URL yang diinginkan di sini
+                    print('Visiting the desired page: %s' % self.browser.current_url)
+                    break        
+           self.random_sleep()
+                index = str(page_index + 1)
+                self.browser.find_element_by_link_text(index).click()
+                self.random_sleep(short=True)
+        
+       except Exception as e:
+            print('An error occurred: %s' % str(e))
+            # Handle the error here, log it or handle it based on your requirements
+
+        finally:
+            # Pastikan bahwa self.browser selalu dihancurkan dengan benar
+            if self.browser:
+                self.browser.quit()
 
         # Found page
         self.random_sleep(short=True)
